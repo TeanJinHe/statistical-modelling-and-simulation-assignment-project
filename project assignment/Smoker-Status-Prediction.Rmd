@@ -1,0 +1,289 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+csv_file_path <- "C:\\Users\\user\\OneDrive\\Desktop\\Sem 5 Slide\\STATISTICAL MODELLING AND SIMULATION\\project assignment\\train_dataset.csv"
+
+df <- read.csv(csv_file_path)
+
+# Display the first few rows of the data frame
+head(df)
+```
+```{r}
+#get column names
+names(df)
+```
+
+```{r}
+#check if any null value 
+sum(is.na(df))
+```
+```{r}
+#Check if any duplicated data
+sum(duplicated(df))
+```
+```{r}
+duplicated_rows <- df[duplicated(df),]
+duplicated_rows
+```
+
+```{r}
+df<-unique(df)
+df
+```
+
+
+```{r}
+#Display the list structure
+str(df)
+```
+
+```{r}
+# get number of rows and columns of data frame
+dim(df)
+```
+```{r}
+# check null values in dataset
+colSums(is.na(df))
+```
+```{r}
+summary(df)
+```
+#Exploratory Data Analysis (EDA)
+```{r}
+hist(df$age, freq=FALSE, col="gray", xlab="Age", main = "Histogram Age")
+curve(dnorm(x, mean=mean(df$age), sd=sd(df$age)), add=TRUE, col="red") #line
+hist(df$height.cm., freq=FALSE, col="gray", xlab="Heigh(cm)", main = "Histogram Height")
+curve(dnorm(x, mean=mean(df$height.cm.), sd=sd(df$height.cm.)), add=TRUE, col="red") #line
+hist(df$systolic, freq=FALSE, col="gray", xlab="Systolic", main = "Histogram Systolic")
+curve(dnorm(x, mean=mean(df$systolic), sd=sd(df$systolic)), add=TRUE, col="red") #line
+hist(df$fasting.blood.sugar, freq=FALSE, col="gray", xlab="Fasting Blood Sugar", main = "Histogram Blood Sugar")
+curve(dnorm(x, mean=mean(df$fasting.blood.sugar), sd=sd(df$fasting.blood.sugar)), add=TRUE, col="red") #line
+hist(df$triglyceride, freq=FALSE, col="gray", xlab="Triglyceride", main = "Histogram Triglyceride")
+curve(dnorm(x, mean=mean(df$triglyceride), sd=sd(df$triglyceride)), add=TRUE, col="red") #line
+hist(df$HDL, freq=FALSE, col="gray", xlab="HDL", main = "Histogram HDL")
+curve(dnorm(x, mean=mean(df$HDL), sd=sd(df$HDL)), add=TRUE, col="red") #line
+hist(df$hemoglobin, freq=FALSE, col="gray", xlab="Hemoglobin", main = "Histogram Hemoglobin")
+curve(dnorm(x, mean=mean(df$hemoglobin), sd=sd(df$hemoglobin)), add=TRUE, col="red") #line
+hist(df$serum.creatinine, freq=FALSE, col="gray", xlab="Serum Creatinine", main = "Histogram Serum Creatinine")
+curve(dnorm(x, mean=mean(df$serum.creatinine), sd=sd(df$serum.creatinine)), add=TRUE, col="red") #line
+hist(df$ALT, freq=FALSE, col="gray", xlab="ALT", main = "Histogram ALT")
+curve(dnorm(x, mean=mean(df$ALT), sd=sd(df$ALT)), add=TRUE, col="red") #line
+hist(df$Gtp, freq=FALSE, col="gray", xlab="Gtp", main = "Histogram Gtp")
+curve(dnorm(x, mean=mean(df$Gtp), sd=sd(df$Gtp)), add=TRUE, col="red") #line
+barplot(table(df$dental.caries), main = "Dental Caries")
+```
+```{r}
+# add a normal distribution line in histogram
+hist(iris$Petal.Length, freq=FALSE, col="gray", xlab="Petal Length", main="Colored histogram")
+curve(dnorm(x, mean=mean(iris$Petal.Length), sd=sd(iris$Petal.Length)), add=TRUE, col="red") #line
+```
+
+
+```{r}
+round(cor(df),4)
+```
+```{r}
+#scatter plot
+# Load packages
+library(tidyverse)
+
+# Load data
+data(df)
+
+# Create a scatter plot of mpg, disp, and cyl
+# Create a scatter plot of age, height, and smoking
+ggplot(df, aes(x = age, y = height.cm. , color = smoking)) +
+  geom_point() +
+  labs(x = "Age (years)", y = "Height (cm)", color = "Smoking Status")
+```
+Based on this scatter plot , we can see that the blue colour which represent the person is a smoker and the black colour represent the person is not a smoker. So, most of the people are not as smoker since the black dots are more than blue dots.
+
+```{r}
+# Load packages
+library(tidyverse)
+library(corrplot)
+
+# Load data
+data(df)
+
+# Calculate correlation matrix
+cor_mat <- cor(df)
+
+# Plot correlation matrix
+corrplot(cor_mat, method = "color", type = "upper", tl.col = "black", tl.srt = 45)
+```
+From the data it appears that, the box that has a color is getting very blue then, can we say it has a great correlation.
+
+From the heatmap, there appears to be a number that shows a negative number, which means that when the number is negative, the data has a relationship that is rather than reversed. Whereas, for positive data have a relationship that is compared to straight.
+
+If the number is approaching zero, then the more correlational it is, so in the sense of not having a relationship that can conclude.
+
+a. Investigate the basic model obtained from the data set.
+
+```{r}
+
+logreg <- glm(formula = smoking ~ ., family = binomial(link="logit"), data = df) 
+summary(logreg)
+```
+
+```{r}
+ #Install and load the 'car' package (if not already installed)
+ #install.packages("car")
+library(car)
+
+# Assuming 'lm_model' is your linear regression model
+# Make sure your model is fitted before calculating VIF
+
+# Calculate VIF
+vif_values <- car::vif(logreg)
+
+# Print the VIF values
+print(vif_values)
+```
+
+
+```{r}
+anova(logreg, test="Chisq")
+```
+
+######################################## Results & Interpretation ########################################
+
+Significance Codes:
+
+'***': Very highly significant (p-value < 0.001).
+'**': Highly significant (p-value < 0.01).
+'*': Significant at a 5% level (p-value < 0.05).
+' ': Not significant (p-value > 0.1).
+
+Results from the fitted logistic regression model shows that there are some insignificant variables such as"age ", "eyesight.left.", "eyesight.right.", "hearing.left.   ", "hearing.right. ", "Cholesterol ", "LDL", "AST " and "relaxation" based on its respective p-values.
+
+Variance Inflation Factors (VIF).
+
+The Variance Inflation Factor (VIF) measures the inflation in the coefficient of the independent variable due to the collinearities among the other independent variables.
+
+A VIF of 1 means that the regression coefficient is not inflated by the presence of the other predictors, and hence multicollinearity does not exist.
+
+Ideally, the Variance Inflation Factors are below 5.
+
+Results from multicollinearity with VIF test shows that weight.kg. (VIF: 6.23): This variable has a relatively high VIF, indicating that its variance is inflated due to its correlation with other predictors and waist.cm. (VIF: 4.43): While this VIF is above 2, it is not extremely high. However, it suggests some correlation with other predictors.
+
+Results from the ANOVA test shows that "eyesight.left.", "eyesight.right.", "hearing.left.   ", "hearing.right. ", "Cholesterol ", "LDL", "Urine.protein", "AST " are insignificant to the fitted model.
+
+This is judged by the low deviance residuals as well as the Pr(>Chi) of > .05, respectively.
+
+Hence, fit the updated glm() model (logistic regression) without the insignificant variables and non-collinear variables into logreg2.
+
+
+b. Develop the best model as your solution based on this course.
+
+
+```{r}
+### Fit the updated glm() model (logistic regression) into logreg2.
+logreg2 <- glm(formula = smoking ~ age + height.cm. + systolic + 
+                  fasting.blood.sugar + triglyceride  + 
+                 HDL + hemoglobin + serum.creatinine + ALT + Gtp + dental.caries, 
+               family = binomial(link="logit"), 
+               data = df) 
+
+summary(logreg2)
+
+
+```
+
+```{r}
+### Use the anova() function to analyze the updated table of deviance.
+anova(logreg2, test="Chisq")
+```
+
+######################################## Results & Interpretation ########################################
+
+ Results from the updated fitted logistic regression model shows that only "serum.creatinine" variable is insignificant based on its p-value.
+
+Additionally, results from the ANOVA test shows all variables, including "serum.creatinine ", are significant to the fitted model.
+
+This is judged by the low deviance residuals as well as the Pr(>Chi) of > .05, respectively.
+
+Hence, the "serum.creatinine " variable is kept in the fitted model. 
+
+
+Check again  by  Variance Inflation Factors (VIF) method.
+
+```{r}
+car::vif(logreg2)
+```
+
+Results show that all the variables have a VIF value of < 5 .
+
+
+Test for the Absence of Strongly Influential Outliers
+
+######################################## Notes ########################################
+
+Test using standardized residuals and Cook's Distance.
+Standardized residuals values > 3 = influential outlier.
+Cook's D value > Cook's D Threshold (4/N) = influential outlier.
+
+
+```{r}
+### Place all the calculated values from the logistic regression model into a new data frame.
+library(dplyr)
+library(magrittr)
+library(tidyverse)
+library(broom)
+
+logreg.data <- augment(logreg2) %>%
+  mutate(index = 1:n())
+
+### Show the top 6 highest standardized residuals (if > 3 = influential outlier).
+head(logreg.data$.std.resid[order(-logreg.data$.std.resid)])
+
+### Plot of standardized residuals
+plot(fitted(logreg2),
+     rstandard(logreg2))
+
+```
+
+```{r}
+### Set Cook's D Threshold.
+cook_threshold <- 4 / nrow(df)
+
+### Cook's D Plot.
+plot(logreg2, which = 4, id.n = 12)
+abline(h = cook_threshold, col = "red")
+
+### Put outlier data into a new data frame where > Cook's D Threshold = influential outliers.
+influ_out <- logreg.data %>%
+  filter(.cooksd > cook_threshold)
+
+### Get the percentage of influential outliers.
+outliers <- round(100*(nrow(influ_out) / nrow(logreg.data)),1)
+```
+
+```{r}
+### Get the percentage of influential outliers.
+outliers <- round(100*(nrow(influ_out) / nrow(logreg.data)),1)
+
+### Store values in a data variable.
+print_outliers <- format(round(outliers, 2), nsmall = 2)
+
+### Print the number of percentage of observations that exceed Cook's distance threshold.
+sprintf('Proportion of data points that are highly influential = %s Percent', print_outliers)
+```
+
+######################################## Results & Interpretation ########################################
+
+Standardized Residuals.
+Results show that none of the data points of the fitted model consist of any outliers.
+
+Cook's Distance.
+In addition, based on the pre-defined threshold (4/N), only 4.2%  of the data points are in the outlier zone, which is small as well.
+
+
+c. Briefly explain your final model which consider as the best solution.
+
+
+The final logistic regression model was constructed to predict smoking status by considering various health-related variables. Through a stepwise refinement process, insignificant predictors and potential multicollinearity issues were addressed. The resulting model includes significant predictors such as age, height, systolic blood pressure, fasting blood sugar, triglyceride levels, HDL cholesterol, hemoglobin levels, ALT (Alanine Aminotransferase), GTP (Gamma-Glutamyl Transferase), and the presence of dental caries. Notably, serum creatinine levels were found to be statistically insignificant in the updated model. Diagnostic tests, including VIF for multicollinearity, standardized residuals and Cook's Distance for influential outliers, and deviance tests, were conducted to ensure the model's robustness. The findings indicate that the model provides a significant fit without strong evidence of multicollinearity or influential outliers. Interpretation of the coefficients suggests how each predictor contributes to the likelihood of smoking based on individual health characteristics, providing a valuable tool for understanding and predicting smoking behavior.

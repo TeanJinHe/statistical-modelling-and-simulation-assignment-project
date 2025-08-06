@@ -1,0 +1,90 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Data Preprocessing for SMS Project
+
+```{r}
+library(dplyr)
+
+# Read dataset file ckd.csv
+data <- read.csv("C:\\Users\\user\\OneDrive\\Desktop\\Sem 5 Slide\\STATISTICAL MODELLING AND SIMULATION\\project assignment\\ckd.csv", header = TRUE, na.strings = c("?"))
+data
+```
+
+```{r}
+# Mapping of nominal values to binary values
+nominal_to_binary_mapping <- list(
+  Rbc = c("normal" = 0, "abnormal" = 1),
+  Pc = c("normal" = 0, "abnormal" = 1),
+  Pcc = c("present" = 0, "notpresent" = 1),
+  Ba = c("present" = 0, "notpresent" = 1),
+  Htn = c("yes" = 0, "no" = 1),
+  Dm = c("yes" = 0, "no" = 1),
+  Cad = c("yes" = 0, "no" = 1),
+  Appet = c("good" = 0, "poor" = 1),
+  pe = c("yes" = 0, "no" = 1),
+  Ane = c("yes" = 0, "no" = 1)
+)
+nominal_to_binary_mapping 
+```
+
+```{r}
+# Recode nominal values with binary values in the dataset
+for (col in names(nominal_to_binary_mapping)) {
+  data[[col]] <- recode(data[[col]], !!!nominal_to_binary_mapping[[col]])
+}
+data
+```
+
+```{r}
+# Fill null values with mean value of numeric columns
+numeric_cols <- sapply(data, is.numeric)
+data[, numeric_cols] <- lapply(data[, numeric_cols], function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x))
+
+```
+
+```{r}
+# Define a mapping of old column names to new column names
+column_mapping <- c(
+  Age = "age",
+  Bp = "blood_pressure",
+  Sg = "specific_gravity",
+  Al = "albumin",
+  Su = "sugar",
+  Rbc = "red_blood_cells",
+  Pc = "pus_cell",
+  Pcc = "pus_cell_clumps",
+  Ba = "bacteria",
+  Bgr = "blood_glucose_random",
+  Bu = "blood_urea",
+  Sc = "serum_creatinine",
+  Sod = "sodium",
+  Pot = "potassium",
+  Hemo = "hemoglobin",
+  Pcv = "packed_cell_volume",
+  Wbcc = "white_blood_cell_count",
+  Rbcc = "red_blood_cell_count",
+  Htn = "hypertension",
+  Dm = "diabetes_mellitus",
+  Cad = "coronary_artery_disease",
+  Appet = "appetite",
+  pe = "pedal_edema",
+  Ane = "anemia",
+  Class = "class"
+)
+```
+
+```{r}
+# Rename the columns using the mapping
+names(data) <- sapply(names(data), function(x) column_mapping[x])
+data
+```
+
+```{r}
+
+# Save this dataset as cleaned_data.csv for further prediction
+write.csv(data, file = "cleaned_data.csv", row.names = FALSE)
+```
+
